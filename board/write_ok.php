@@ -1,29 +1,23 @@
+<?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/common.php"; ?>
 <?php
-  function take(&$var1, $defValue=''){
-    return isset($var1) ? $var1 : $defValue;
-  }
-  function get($index,$defValue=''){
-    return take($_GET[$index], $defValue);
-  }
-  function post($index,$defValue=''){
-    return take($_POST[$index], $defValue);
-  }
-
-  echo "write_ok.php";
-  echo "/","<br>";
-  
-  $options = post('options',[]);
-
-  $isNotice = post('isNotice', 'n');
-  if($isNotice != 'y') $isNotice = 'n';
 
   $subject = post('subject', '제목없음');
   $writer = post('writer', '작성자 없음');
-  echo '*공지글여부 : ' . $isNotice . "<br>";
-  echo '*제목 : ' . $subject . "<br>";
-  echo '*작성자 : ' . $writer . "<br> ";
-  for($i=0; $i<count($options);$i++){
-    echo '*옵션#' . ($i+1) . ':' . $options[$i] . '<br>';
-  }
+  $pwd = post('pwd');
+  $content = post('content');
 
+  $stmt = $db->
+    prepare("INSERT INTO " .  $_board_options["tableName"] ." (subject, writer, pwd, content) VALUE (:subject,:writer, :pwd, :content)");
+  // idx 는 자동으로 들어감 ';"); delete from board; -- 보드삭제 해커명령
+  $stmt->bindValue(':subject',$subject);
+  $stmt->bindValue(':writer', $writer);
+  $stmt->bindValue(':pwd', $pwd);
+  $stmt->bindValue(':content', $content);
+  $stmt->execute();
+  
+  $db = null;
 ?>
+
+<script>
+  location.href='<?=$_board_options["listPage"]?>';
+</script>
