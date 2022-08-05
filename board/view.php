@@ -7,6 +7,11 @@
   <?php
     return;
   }
+  //게시물 조회수 증가 시키기
+  $stmt = $db-> prepare("UPDATE " . $_board_options["tableName"] . " SET viewCount=viewCount+1 WHERE idx=:idx;");
+  $stmt->bindValue(':idx', $idx);
+  $stmt->execute();
+
   //게시물 가져오기
   $stmt = $db-> prepare("SELECT * FROM " . $_board_options["tableName"] . " WHERE idx=:idx;");
   $stmt->bindValue(':idx', $idx);
@@ -15,9 +20,11 @@
   $error = 0;
   $listTag = '<ul>';
   if($row=$stmt->fetch(PDO::FETCH_BOTH)){
-    $listTag .= '<li>idx: ' .$row['idx'] . ' </li>';
-    $listTag .= '<li>subject: ' .$row['subject'] . '</li>';
-    $listTag .= '<li>writer: ' .$row['writer'] . '</li>';
+    $listTag .= '<li>고유번호: ' .$row['idx'] . ' </li>';
+    $listTag .= '<li>조회수: ' .$row['viewCount'] . '</li>';
+    $listTag .= '<li>제목: ' .$row['subject'] . '</li>';
+    $listTag .= '<li>작성자: ' .$row['writer'] . '</li>';
+    $listTag .= '<li>내용: ' . nl2br($row['content']) . '</li>';
   }else{
     $error += 1;
     $listTag .= '<li>게시글이 삭제되었거나 이동되었을 수 있습니다.</li>';
@@ -36,9 +43,11 @@
     <title><?= $_board_options["name"] ?> 상세보기</title>
     <script>
       function del() {
-        if(confirm('정말 삭제하시겠습니다?')){
+        //2022-08-05 「구성균」修正
+        //비밀번호 적용때문에 필요가 없게 되었습니다.
+        //if(confirm('정말 삭제하시겠습니다?')){
           location.href="<?= $_board_options['delPage']?>?idx=<?=$idx?>";
-        }
+        //} 
       }
 
     </script>
@@ -50,7 +59,7 @@
       <button onclick="document.location.href='/board'">목록</button>
       <?php if($error == 0){?>
         <a href="<?=$_board_options["modifyPage"]?>?idx=<?=$idx?>">수정</a>
-        <a href="#" onclick="del();return false;" >삭제</a>
+        <a href="<?=$_board_options["delPage"]?>?idx=<?=$idx?>" onclick="del();return false;" >삭제</a>
       <?php } ?>
     </div>
   </body>
