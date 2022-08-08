@@ -10,7 +10,7 @@ function chkInputTypeText(selector,regex,errorMsg){
     }
     return true;
   }
-  
+
 //form 체크 도우미
 function kyunCheckForm(options){
     for(let i=0;i<options.length;i++){
@@ -21,6 +21,6 @@ function kyunCheckForm(options){
         }
     }
   }
-      return true;
+    return true;
 }
   
