@@ -9,5 +9,13 @@
   function post($index,$defValue=''){
     return take($_POST[$index], $defValue);
   }
-
+  function session($index,$setValue=NULL){
+    if($setValue == NULL){
+      return take($_SESSION[$index]);
+    }else{
+      $oldValue = take($_SESSION[$index],NULL);
+      $_SESSION[$index] = $setValue;
+      return $oldValue;
+    }
+  }
 ?>

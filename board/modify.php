@@ -1,5 +1,7 @@
 <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/common.php"; ?>
-<?php
+<?php 
+// 페이지별 고유한 작업 처리 영역
+$page_title = '수정 페이지'; // 페이지 이름
 $idx = get('idx', '0');
 if($idx == '0') {
 ?>
@@ -25,65 +27,21 @@ if($row = $stmt->fetch(PDO::FETCH_BOTH)) {
     return;
 }
 
+$q = get('q');
 $db = null;
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title><?=$_board_options["name"]?> 수정</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <script>
-      function chkForm() {
-        //제목 체크
-        if(!chkInputTypeText('#subject',/^\s*$/,'제목을 바르게 입력하세요.')){
-          return false;
-        }
-        //작성자 체크
-        if(!chkInputTypeText('#writer',/^\s*$/,'작성자를 바르게 입력하세요.')){
-          return false;
-        }
-        //내용 체크
-        if(!chkInputTypeText('#content',/^\s*$/,'내용을 바르게 입력하세요.')){
-          return false;
-        }
-        //비밀번호 체크
-        if(!chkInputTypeText('#pwd',/^\D*$/,'비밀번호는 숫자만 입력하세요.')){
-          return false;
-        }
-        return true;
-      }
-      </script>
-    </head>
-    <body>
-    <div id="main" class="container-fluid bg-success bg-gradient h-100 bg-opacity-75 p-0">
-    <header class="p-3 bg-dark text-white">
-    <div class="container-fluid">
-      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"/></svg>
-        </a>
-
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="#" class="nav-link px-2 text-red">Home</a></li>
-          <li><a href="#" class="nav-link px-2 text-white">Features</a></li>
-          <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
-          <li><a href="<?=$_board_options['listPage']?>" class="nav-link px-2 text-white">자유게시판</a></li>
-          <li><a href="#" class="nav-link px-2 text-white">About</a></li>
-        </ul>
-
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-          <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-        </form>
-
-        <div class="text-end">
-          <button type="button" class="btn btn-outline-light me-2">Login</button>
-          <button type="button" class="btn btn-warning">Sign-up</button>
-        </div>
-      </div>
-    </div>
-  </header>
-    </div>
+  <head>
+  <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/_inc_page_head.php"; ?>
+    <!-- 페이지별 헤더 작성 영역 -->
+  </head>
+  <body>
+    <div id="main" class="container-fluid h-100 bg-opacity-75 p-0">
+      <!-- start : global navigation barr --> 
+      <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/_inc_page_gnb.php"; ?>
+      <!-- end : global navigation barr --> 
+      <!-- start : 페이지별 콘텐츠 영역 -->
     <div class="b-example-divider"></div>
     <div class="px-5 pt-3">
       <header class="d-flex align-items-center pb-3 border-bottom">
@@ -93,7 +51,7 @@ $db = null;
     </a>
     </div>
         <div>
-      <form class="px-5" action="<?=$_board_options["writeOkPage"]?>" method="post" onsubmit="return chkForm();"><!--get:편지봉투,post:편지지 -->
+      <form class="px-5" action="<?=$_board_options["writeOkPage"]?>$q=<?=$q?>" method="post" onsubmit="return chkForm();"><!--get:편지봉투,post:편지지 -->
         <div class="col-12 mb-2">
           <label for="subject" class="form-label">제목</label>
           <input type="text" value="<?=$subject?>" class="form-control" id="subject" name="subject" placeholder="제목을 입력하세요">
@@ -122,6 +80,48 @@ $db = null;
         </div>
       </form>
     </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>   
-    </body>
+      <!-- end : 페이지별 콘텐츠 영역 -->
+    
+    <!-- start : footer -->
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/_inc_page_footer.php"; ?>
+    <!-- end : footer -->
+    </div>
+    <!-- 부트스트랩 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script>
+      // 페이지별 스크립트 작성영역  
+      function chkForm() {
+        //제목 체크
+        if(!chkInputTypeText('#subject',/^\s*$/,'제목을 바르게 입력하세요.')){
+          return false;
+        }
+        //작성자 체크
+        if(!chkInputTypeText('#writer',/^\s*$/,'작성자를 바르게 입력하세요.')){
+          return false;
+        }
+        //내용 체크
+        if(!chkInputTypeText('#content',/^\s*$/,'내용을 바르게 입력하세요.')){
+          return false;
+        }
+        //비밀번호 체크
+        if(!chkInputTypeText('#pwd',/^\D*$/,'비밀번호는 숫자만 입력하세요.')){
+          return false;
+        }
+        return true;
+      }
+    </script>
+  </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+

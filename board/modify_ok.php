@@ -38,11 +38,12 @@ $stmt->bindValue(':content', $content);
 $stmt->bindValue(':idx', $idx);
 $stmt->execute();
 
+$q = get('q');
 $db = null;
 ?>
 
 <script>
-    location.href='<?=$_board_options["viewPage"]?>?idx=<?=$idx?>';
+    location.href='<?=$_board_options["viewPage"]?>?idx=<?=$idx?>$q=<?=$q?>';
 </script>
 
 
