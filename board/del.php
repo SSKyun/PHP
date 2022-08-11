@@ -48,7 +48,7 @@ $db = null;
         </div>
         <br/>
         <div>
-          <button class="btn btn-secondary" onclick="history.back">취소</button>
+          <button class="btn btn-secondary" onclick="history.back();">취소</button>
           <input class="btn btn-success" type="submit" value="삭제확인">
         </div>
             </form>

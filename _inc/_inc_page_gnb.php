@@ -17,13 +17,12 @@
 
             <div class="text-end">
               <?php
-              if(session('login_email') != ''){ ?>
-                <button type="button" class="btn btn-outline-light me-2"><?=$_SESSION['login_email']?></button>
-                <button type="button" class="btn btn-warning" onclick="location.href='/signIn.php'" >Log OUT</button>  
+              if(IS_LOGIN_USER){ ?>
+                <button type="button" class="btn btn-outline-light me-2" onclick="location.href='/user_update1.php'" ><?=session(SESSION_NAME_LOGIN_ID)?></button>
+                <button type="button" class="btn btn-warning" onclick="location.href='/logout.php'">Log OUT</button>  
               <?php } else { ?>
                 <button type="button" class="btn btn-outline-light me-2" onclick="location.href='/login.php'" >Login</button>
                 <button type="button" class="btn btn-warning" onclick="location.href='/join.php'">Sign-up</button>
-            
               <?php } ?>
               </div>
           </div>

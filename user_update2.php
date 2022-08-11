@@ -1,7 +1,25 @@
 <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/common.php"; ?>
 <?php
+//비밀번호 체크를 먼저 해주고 틀리면 다시 비밀번호를 입력받도록 페이지이동
+// 비밀번호확인을 위해 회원정보 가져오기
+$stmt = $db->prepare("SELECT * FROM " . $_user_options["tableName"] . " WHERE email=:email;");
+$stmt->bindValue(':email', session(SESSION_NAME_LOGIN_ID));
+$stmt->execute();
+if($row = $stmt->fetch(PDO::FETCH_BOTH)) {
+    if($row['pwd'] != post('pwd')) {
+        ?>
+        <script>alert('비밀번호가 일치하지 않습니다.');history.back();</script>
+        <?php
+        return;
+    }
+} else {
+    ?>
+    <script>alert('잘못된 접근입니다.');location.href='<?=$_user_options["logoutPage"]?>';</script>
+    <?php
+    return;
+}
 // 페이지별 고유한 작업 처리 영역
-$page_title = '회원가입';
+$page_title = '회원정보수정';
 ?>
 
 <!doctype html>
@@ -21,7 +39,7 @@ $page_title = '회원가입';
                 <header class="d-flex align-items-center pb-3 mb-1">
                     <a href="#" class="d-flex align-items-center text-dark text-decoration-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg>
-                    <span class="fs-4">회원가입작성</span>
+                    <span class="fs-4">회원정보수정</span>
                     </a>
                 </header>
                 <form action="/join_ok.php" method="post" onsubmit="return chkForm();">
@@ -104,17 +122,17 @@ $page_title = '회원가입';
                 let pwd = $('#pwd').val();
                 let pwd2 = $('#pwd2').val();
                 if(pwd == ''){
-                    $('#pwd2-comment').html('비밀번호를 먼저 입력하세요.');
                     pwdOk = false;
+                    $('#pwd2-comment').html('비밀번호를 먼저 입력하세요.');
                     return;       
                 }
                 if(pwd == pwd2){
-                    $('#pwd2-comment').html('비밀번호와 일치합니다.');
                     pwdOk = true;
+                    $('#pwd2-comment').html('비밀번호와 일치합니다.');
                     return;
                 }else{
-                    $('#pwd2-comment').html('비밀번호와 일치하지않습니다.');
                     pwdOk = false;
+                    $('#pwd2-comment').html('비밀번호와 일치하지않습니다.');
                     return;
                 }
                 console.log(`${pwd} : ${pwd2}`)
@@ -146,8 +164,8 @@ $page_title = '회원가입';
                         $('#pwd-comment').html('<span class="level-1 text-secondary">취약</span>');
                         break;
                 }
+                console.log(pwdLvOk);
             }
-            //이메일
             function emailValueUpdated() {
                 let email = $('#email').val();
                 if(!/^[a-zA-Z0-9._-]{1,}@[0-9a-zA-Z-]{3,}([.][a-zA-Z]{2,3}){1,2}$/.test(email)) {
@@ -173,7 +191,7 @@ $page_title = '회원가입';
                 }
                 $.get( `/chkDualEmail.php?email=${encodeURIComponent(email)}`, function( data ) {
                     $('#checkDualEmail').val(data);
-                    alert(data.trim() == 'true' ? '가입 가능한 이메일 입니다.' : `이미 가입된 이메일입니다.${data}`);
+                    alert(data.trim() == 'true' ? '가입 가능한 이메일 입니다.' : '이미 가입된 이메일 입니다.');
                 });
             }
             function chkForm() {
@@ -198,7 +216,7 @@ $page_title = '회원가입';
                     alert('전화번호를 확인해주세요');
                     return false;
                 }
-                return true;
+                return false;
 
             }
             </script>
