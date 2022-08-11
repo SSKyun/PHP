@@ -26,6 +26,15 @@
       "name" => "자주하는 질문",
       "tableName" => "faq1",
     ],
+    "user" => [
+      "name" => "회원정보",
+      "tableName" => "users",
+      "joinPage" => "/join.php",
+      "loginPage" => "/login.php",
+      "logoutPage" => "/logout.php",
+      "insert_columns" => ['email','pwd','user_name','hp'],
+    ],
   ];
   $_board_options = $_site_options['board'];
+  $_user_options = $_site_options['user'];
 ?>

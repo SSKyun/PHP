@@ -51,7 +51,7 @@ $db = null;
     </a>
     </div>
         <div>
-      <form class="px-5" action="<?=$_board_options["writeOkPage"]?>$q=<?=$q?>" method="post" onsubmit="return chkForm();"><!--get:편지봉투,post:편지지 -->
+      <form class="px-5" action="<?=$_board_options["writeOkPage"]?>" method="post" onsubmit="return chkForm();"><!--get:편지봉투,post:편지지 -->
         <div class="col-12 mb-2">
           <label for="subject" class="form-label">제목</label>
           <input type="text" value="<?=$subject?>" class="form-control" id="subject" name="subject" placeholder="제목을 입력하세요">

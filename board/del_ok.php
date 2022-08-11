@@ -7,7 +7,6 @@ if($idx == '0') {
 <?php
 return;
 }
-$q = get('q');
 $pwd = post('pwd');
 
 // 비밀번호확인을 위해 게시물 가져오기
@@ -31,8 +30,9 @@ if($row = $stmt->fetch(PDO::FETCH_BOTH)) {
 $stmt = $db->prepare("DELETE FROM " . $_board_options["tableName"] . " WHERE idx=:idx;");
 $stmt->bindValue(':idx', $idx);
 $stmt->execute();
+$q = get('q');
 ?>
-<script>alert('게시물이 삭제되었습니다.');location.href='<?=$_board_options["listPage"]?>$q=<?=$q?>';</script>
+<script>alert('게시물이 삭제되었습니다.');location.href='<?=$_board_options["listPage"]?>';</script>
 <?php
 $db = null;
 ?>

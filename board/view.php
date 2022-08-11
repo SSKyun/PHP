@@ -88,7 +88,7 @@ $idx = get('idx', '0');
                 // 2022. 8. 5 [김대호] 수정
                 // 비밀번호 적용때문에 필요가 없게 되었습니다.
                 //if(confirm('정말 삭제하시겠습니까?')) {
-                    location.href="<?=$_board_options["delPage"]?>?idx=<?=$idx?>";
+                    location.href="<?=$_board_options["delPage"]?>?idx=<?=$idx?>$q=<?=$q?>";
                 //}
             }
     </script>
