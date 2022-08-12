@@ -10,7 +10,7 @@ return;
 }
 
 // 비밀번호확인을 위해 게시물 가져오기
-$stmt = $db->prepare("SELECT * FROM " . $_user_options["tableName"] . " WHERE email=:email;");
+$stmt = $db->prepare("SELECT * FROM " . $_user_options["tableName"] . " WHERE out_at IS NULL AND email=:email;");
 $stmt->bindValue(':email', $email);
 $stmt->execute();
 if($row = $stmt->fetch(PDO::FETCH_BOTH)) {

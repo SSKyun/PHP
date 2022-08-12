@@ -11,12 +11,11 @@ if($row = $stmt->fetch(PDO::FETCH_BOTH)) {
         <script>alert('비밀번호가 일치하지 않습니다.');history.back();</script>
         <?php
         return;
+    }else {
+        // 비밀번호 일치한 회원정보를 저장
+        $user_name = $row['user_name'];
+        $hp = $row['hp'];
     }
-} else {
-    ?>
-    <script>alert('잘못된 접근입니다.');location.href='<?=$_user_options["logoutPage"]?>';</script>
-    <?php
-    return;
 }
 // 페이지별 고유한 작업 처리 영역
 $page_title = '회원정보수정';
@@ -42,21 +41,18 @@ $page_title = '회원정보수정';
                     <span class="fs-4">회원정보수정</span>
                     </a>
                 </header>
-                <form action="/join_ok.php" method="post" onsubmit="return chkForm();">
+                <form action="/user_update3.php" method="post" onsubmit="return chkForm();">
                     <input type="hidden" id="checkDualEmail" value="false">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email address</label>                        
                         <div class="input-group">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" onchange="changeEmailValue();" onkeyup="emailValueUpdated();">
-                            <button class="btn btn-outline-secondary" type="button" onclick="chkDualEmail();return false;">중복확인</button>
-                        </div>
-                        <div id="email-comment" class="m-2"></div>                        
+                            <input type="email" class="form-control" id="email" name="email" value="<?=session(SESSION_NAME_LOGIN_ID)?>" readonly>
+                        </div>                       
                     </div>
-
                     <div class="mb-3">
                         <label for="pwd" class="form-label">Password</label>
                         <input type="password" class="form-control" id="pwd" name="pwd" placeholder="비밀번호" onchange="chkPwdLv();" onkeyup="chkPwdLv();">
-                        <div id="pwd-comment" class="m-2">비밀번호 보안성 체크</div> 
+                        <div id="pwd-comment" class="m-2">비밀번호를 변경할때만 입력하세요.</div> 
                     </div>
 
                     <div class="mb-3">
@@ -67,13 +63,13 @@ $page_title = '회원정보수정';
 
                     <div class="mb-3">
                         <label for="user-name" class="form-label">User Name</label>
-                        <input type="text" class="form-control" id="user-name" name="user_name" placeholder="이름" onchange="chkUserName();" onkeyup="chkUserName();">
+                        <input type="text" class="form-control" id="user-name" name="user_name" placeholder="이름" value="<?=$user_name;?>" onchange="chkUserName();" onkeyup="chkUserName();">
                         <div id="user-name-comment" class="m-2">이름 입력 체크</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="hp" class="form-label">Phone Number</label>
-                        <input type="text" class="form-control" id="hp" name="hp" placeholder="휴대전화번호" onchange="chkHp();" onkeyup="chkHp();">
+                        <input type="text" class="form-control" id="hp" name="hp" placeholder="휴대전화번호" value="<?=$hp;?>" onchange="chkHp();" onkeyup="chkHp();">
                         <div id="hp-comment" class="m-2">전화번호 체크</div>
                     </div>
 
@@ -93,6 +89,8 @@ $page_title = '회원정보수정';
             let pwdOk = false;
             let userNameOk = false;
             let hpOk = false;
+            checkUserName();
+            checkHP();
             // 페이지별 스크립트 작성 영역
             function chkHp(){//전화번호 체크
                 let hp = $('#hp').val();
@@ -126,6 +124,7 @@ $page_title = '회원정보수정';
                     $('#pwd2-comment').html('비밀번호를 먼저 입력하세요.');
                     return;       
                 }
+                
                 if(pwd == pwd2){
                     pwdOk = true;
                     $('#pwd2-comment').html('비밀번호와 일치합니다.');
@@ -195,18 +194,16 @@ $page_title = '회원정보수정';
                 });
             }
             function chkForm() {
-                let checkDualEmail = $('#checkDualEmail').val();
-                if(checkDualEmail != 'true') {
-                    alert('이메일 중복 체크를 해주세요.');
-                    return false;
-                }
-                if(pwdLvOk < 2){
-                    alert('비밀번호를 보다 보안성이 높게 설정해주세요.');
-                    return false;
-                }
-                if(!pwdOk){
-                    alert('비밀번호와 비밀번호 확인이 올바르지 않습니다.');
-                    return false;
+                let pwd = $('#pwd').val();
+                if(pwd != ''){
+                    if(pwdLvOk < 2){
+                        alert('비밀번호를 보다 보안성이 높게 설정해주세요.');
+                        return false;
+                    }
+                    if(!pwdOk){
+                        alert('비밀번호와 비밀번호 확인이 올바르지 않습니다.');
+                        return false;
+                    }
                 }
                 if(!userNameOk){
                     alert('이름을 확인해주세요');

@@ -2,12 +2,21 @@
 <?php 
 // 페이지별 고유한 작업 처리 영역
 $page_title = '자유게시판'; // 페이지 명
+
+//페이지당 게시물 수
+$page_max_rows = 15;
+//현재 페이지 번호
+$page_no = (int)get('page_no',1);
+
+//쿼리에서 시작 인덱스
+$sql_start_index = ($page_no - 1) * $page_max_rows;
+
 //검색어 처리
 $q = get('q');
 $sql_where = '';
 $bindValue = '';
 if($q != ''){
-  $sql_where = ' WHERE subject LIKE :subject OR writer LIKE :writer OR content LIKE :content';
+  $sql_where = ' WHERE (subject LIKE :subject) OR (writer LIKE :writer) OR (content LIKE :content)';
   $bindValue = "%" . $q . "%";
 }
 
@@ -21,19 +30,19 @@ $total_count = $stmt1->fetchColumn();
 $sql = "SELECT COUNT(*) FROM " . $_board_options["tableName"] . $sql_where . ";";
 $stmt1 = $db-> prepare($sql);
 if($q != ''){
-  $stmt1->bindValue(':subject',$bindValue);
-  $stmt1->bindValue(':writer',$bindValue);
-  $stmt1->bindValue(':content',$bindValue);
+  $stmt1->bindParam(':subject',$bindValue, PDO::PARAM_STR);
+  $stmt1->bindParam(':writer',$bindValue, PDO::PARAM_STR);
+  $stmt1->bindParam(':content',$bindValue, PDO::PARAM_STR);
 }
 $stmt1->execute();
 $search_count = $stmt1->fetchColumn();
 
 // 검색된 게시물 목록
-$stmt2 = $db-> prepare("SELECT * FROM " . $_board_options["tableName"] . $sql_where ." ORDER BY idx DESC;");
+$stmt2 = $db-> prepare("SELECT * FROM " . $_board_options["tableName"] . " ORDER BY idx DESC;".$sql_where ." LIMIT". $sql_start_index .",". $page_max_rows );
 if($q != ''){
-  $stmt2->bindValue(':subject',$bindValue);
-  $stmt2->bindValue(':writer',$bindValue);
-  $stmt2->bindValue(':content',$bindValue);
+  $stmt2->bindParam(':subject',$bindValue, PDO::PARAM_STR);
+  $stmt2->bindParam(':writer',$bindValue, PDO::PARAM_STR);
+  $stmt2->bindParam(':content',$bindValue, PDO::PARAM_STR);
 }
 $stmt2->execute();
 $count = $stmt2->rowCount();
@@ -51,6 +60,24 @@ while($row=$stmt2->fetch(PDO::FETCH_BOTH)){
   ];
   $article_list[] = $article_row;
 }
+// 페이징에 필요한 계산
+$prev_page_no = max($page_no - 1,1);
+/* if($prev_page_no < 1){
+  $prev_page_no = 1;
+} */
+$max_page_no = 1;
+if($search_count > $page_max_rows){
+  $max_page_no = floor(($search_count - 1) / $page_max_rows) + 1;
+}
+$next_page_no = min($page_no + 1,$max_page_no);
+/* if($next_page_no > $max_page_no){
+  $next_page_no = $max_page_no;
+}
+ */
+// 게시판 숫자 중앙 (숙제)
+$page_block = 10;
+$start_page_block = floor(($page_no - 1) / $page_block)* $page_block + 1;
+$end_page_bloack = min($start_page_block + $page_block - 1,$max_page_no);
 
 $db = null;
 ?>
@@ -68,7 +95,7 @@ $db = null;
     </style>
   </head>
   <body>
-    <div id="main" class="container-fluid h-100 bg-opacity-75 p-0">
+    <div id="main" class="container-fluid h-100 p-0">
       <!-- start : global navigation barr --> 
       <?php include_once $_SERVER['DOCUMENT_ROOT'] . "/_inc/_inc_page_gnb.php"; ?>
       <!-- end : global navigation barr --> 
@@ -77,7 +104,7 @@ $db = null;
       <header class="d-flex align-items-center pb-3 border-bottom">
         <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg>
-          <span class="fs-4"><?=$_board_options['name']?>(게시물수: <?=$search_count ?>/<?= $total_count?>건)</span>
+          <span class="fs-4"><?=$_board_options['name']?>(페이지 : <?=$page_no?> / <?=$max_page_no?>)(게시물수: <?=count($article_list)?> / <?=$search_count ?>/전체 <?= $total_count?>건)</span>
         </a>
       </header>
     </div>
@@ -103,11 +130,9 @@ $db = null;
         <tbody>
           <?php
             for($i = 0; $i<count($article_list);$i++){
-
-            
           ?>
         <tr>
-          <td class="td-no"><?=($i+1)?></td> 
+          <td class="td-no"><?=($sql_start_index+$i+1)?></td> 
           <td class="td-subject"><a href="<?=$_board_options["viewPage"]?>?idx=<?=$article_list[$i]["idx"]?>$q=<?=$q?>">
           <?=$article_list[$i]["subject"]?></a></td> 
           <td class="td-writer"><?=$article_list[$i]["writer"]?></td> 
@@ -119,6 +144,18 @@ $db = null;
           ?> 
       </tbody>
     </table>
+    <div>
+      <a href="?page_no1$q=<?$q?>" class="btn btn-sm btn-secondary">첫페이지</a>
+      <a href="?page_no<?=$prev_page_no?>$q=<?$q?>" class="btn btn-sm btn-secondary">이전</a>
+      <?php for($i=$start_page_block;$i<=$end_page_bloack;$i++){?>
+        <a href="?page_no=<?=$i?>$q=<?=$q?>" class="btn btn-sm btn<?php ?>-secondary"></a>
+      <?php 
+      }
+      ?>
+      <a href="?page_no<?=$next_page_no?>$q=<?$q?>" class="btn btn-sm btn-secondary">다음</a>
+      <a href="?page_no<?=$max_page_no?>$q=<?$q?>" class="btn btn-sm btn-secondary">끝페이지</a>
+      
+    </div>
     <div>
       <a class="btn btn-outline-info" href="<?= $_board_options["writePage"] ?>">new</a>
     </div>
